@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using Application.Entities;
+using Application.UseCases;
 using ConsoleApp.UI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,25 +22,36 @@ public static class Program
         ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
         RootCommand rootCommand = new();
-        rootCommand.SetHandler(HandleRootCommand);
 
         foreach (Command command in serviceProvider.GetServices<Command>())
         {
             rootCommand.AddCommand(command);
         }
 
+        rootCommand.SetHandler(async () => await HandleRootCommand(serviceProvider.GetRequiredService<TodoUseCases>()));
+
         rootCommand.Invoke(args);
     }
 
-    private static void HandleRootCommand()
+    private static async Task HandleRootCommand(TodoUseCases todoUseCases)
     {
-        List<string> header = ["id", "name", "due", "pri"];
-        List<List<string>> content =
-        [
-            ["1", "todo113", "", "l"],
-            ["222", "todo2", "", "m"],
-            ["3", "tod123123o32", "", "asdh"],
-        ];
+        List<Todo> todos = await todoUseCases.GetAllActive();
+        if (todos.Count == 0)
+        {
+            Console.WriteLine("empty");
+            return;
+        }
+
+        List<string> header = ["name", "due", "pri", "urg"];
+        List<List<string>> content = todos
+            .Select(m => new List<string>
+            {
+                m.Name,
+                new TimeUIFactory(m.DueDate).CreateRelative(),
+                new PriorityUIFactory(m.Priority).Create(),
+                new UrgencyUIFactory(m.GetUrgency()).Create(),
+            })
+            .ToList();
 
         Console.WriteLine(new TableUIFactory(header, content).Create());
     }

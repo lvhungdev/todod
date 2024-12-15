@@ -14,9 +14,12 @@ public class TodoUseCases
         _dbContext = dbContext;
     }
 
-    public Task<List<Todo>> GetAllActive()
+    public async Task<List<Todo>> GetAllActive()
     {
-        return _dbContext.Todos.Where(m => m.CompletedDate != default).ToListAsync();
+        List<Todo> todos = await _dbContext.Todos.Where(m => m.CompletedDate == default).ToListAsync();
+        todos = todos.OrderByDescending(m => m.GetUrgency()).ToList();
+
+        return todos;
     }
 
     public async Task<Result<Todo>> Add(string name, DateTime dueDate = default, Priority priority = default)

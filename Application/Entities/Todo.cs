@@ -19,7 +19,7 @@ public class Todo
             urgency += 0.2f;
 
             TimeSpan duration = DueDate - DateTime.Now;
-            float durationInSeconds = Math.Max(0, 60 * 60 * 24 * 7 - duration.Seconds);
+            float durationInSeconds = Math.Max(0, 60 * 60 * 24 * 7 - (int)duration.TotalSeconds);
 
             const float urgencyPerDay = 1.0f;
             const float urgencyPerSecond = urgencyPerDay / (60 * 60 * 24);
