@@ -40,4 +40,15 @@ public class TodoUseCases
 
         return todo;
     }
+
+    public async Task<Result<Todo>> Complete(string id)
+    {
+        Todo? todo = await _dbContext.Todos.SingleOrDefaultAsync(m => m.Id == id);
+        if (todo == null) return Result.Fail($"todo with id {id} could not be found");
+
+        todo.CompletedDate = DateTime.Now;
+        await _dbContext.SaveChangesAsync();
+
+        return todo;
+    }
 }
