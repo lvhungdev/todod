@@ -42,10 +42,11 @@ public static class Program
             return;
         }
 
-        List<string> header = ["name", "due", "pri", "urg"];
+        List<string> header = ["id", "name", "due", "pri", "urg"];
         List<List<string>> content = todos
-            .Select(m => new List<string>
+            .Select((m, i) => new List<string>
             {
+                (i + 1).ToString(),
                 m.Name,
                 new TimeUIFactory(m.DueDate).CreateRelative(),
                 new PriorityUIFactory(m.Priority).Create(),

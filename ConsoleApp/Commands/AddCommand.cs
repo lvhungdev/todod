@@ -13,7 +13,6 @@ public class AddCommand : Command
     public AddCommand(TodoUseCases todoUseCases) : base("add", "Add a new todo")
     {
         _todoUseCases = todoUseCases;
-
         Setup();
     }
 
