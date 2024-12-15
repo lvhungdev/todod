@@ -53,7 +53,12 @@ public static class Program
                 new UrgencyUIFactory(m.GetUrgency()).Create(),
             })
             .ToList();
+        List<TableUIRowAlign> rowAligns =
+        [
+            TableUIRowAlign.Right, TableUIRowAlign.Left, TableUIRowAlign.Right, TableUIRowAlign.Right,
+            TableUIRowAlign.Right,
+        ];
 
-        Console.WriteLine(new TableUIFactory(header, content).Create());
+        Console.WriteLine(new TableUIFactory(header, content, rowAligns).Create());
     }
 }

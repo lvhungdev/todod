@@ -4,12 +4,13 @@ public class TableUIFactory
 {
     private readonly List<string> _header;
     private readonly List<List<string>> _content;
+    private readonly List<TableUIRowAlign> _rowAligns;
 
-    public TableUIFactory(List<string> header, List<List<string>> content)
+    public TableUIFactory(List<string> header, List<List<string>> content, List<TableUIRowAlign> rowAligns)
     {
-        if (content.Any(row => row.Count != header.Count))
+        if (content.Any(row => row.Count != header.Count) || header.Count != rowAligns.Count)
         {
-            throw new Exception("header and content do not have the same size");
+            throw new Exception("header or content or rowAlign do not have the same size");
         }
 
         List<string> headerRow = [];
@@ -31,6 +32,7 @@ public class TableUIFactory
 
         _header = headerRow;
         _content = contentRow;
+        _rowAligns = rowAligns;
     }
 
     public string Create()
@@ -41,12 +43,14 @@ public class TableUIFactory
         List<int> countEachCol = GetMaxCountEachColumn(_content);
         _content.RemoveAt(_content.Count - 1);
 
-        result += string.Join(" ", GetAlignedRow(_header, countEachCol)) + "\n";
+        List<TableUIRowAlign> headerAligns = Enumerable.Repeat(TableUIRowAlign.Left, _header.Count).ToList();
+        result += string.Join(" ", GetAlignedRow(_header, countEachCol, headerAligns)) + "\n";
+
         result += string.Join(" ", GetDividers('-', countEachCol)) + "\n";
 
         foreach (List<string> row in _content)
         {
-            result += string.Join(" ", GetAlignedRow(row, countEachCol)) + "\n";
+            result += string.Join(" ", GetAlignedRow(row, countEachCol, _rowAligns)) + "\n";
         }
 
         return result;
@@ -57,12 +61,15 @@ public class TableUIFactory
         return countEachCol.Select(m => string.Join("", Enumerable.Repeat(divider, m))).ToList();
     }
 
-    private static List<string> GetAlignedRow(List<string> row, List<int> countEachCol)
+    private static List<string> GetAlignedRow(List<string> row, List<int> countEachCol, List<TableUIRowAlign> align)
     {
         IEnumerable<(string col, int size)> combined = row.Zip(countEachCol, (m1, m2) => (m1, m2));
 
         return combined
-            .Select((m, i) => row[i] + string.Join("", Enumerable.Repeat(" ", m.size - m.col.Length)))
+            .Select((m, i) =>
+                align[i] == TableUIRowAlign.Right
+                    ? string.Join("", Enumerable.Repeat(" ", m.size - m.col.Length)) + row[i]
+                    : row[i] + string.Join("", Enumerable.Repeat(" ", m.size - m.col.Length)))
             .ToList();
     }
 
@@ -82,4 +89,10 @@ public class TableUIFactory
 
         return result;
     }
+}
+
+public enum TableUIRowAlign
+{
+    Left,
+    Right,
 }
