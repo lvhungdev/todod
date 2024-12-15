@@ -39,6 +39,7 @@ public static class Dependencies
         return services
             .AddScoped<Command, ListCommand>()
             .AddScoped<Command, AddCommand>()
-            .AddScoped<Command, CompleteCommand>();
+            .AddScoped<Command, CompleteCommand>()
+            .AddScoped<Command, ModifyCommand>();
     }
 }

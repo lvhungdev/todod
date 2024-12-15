@@ -17,7 +17,7 @@ public class CompleteCommand : Command
 
     private void Setup()
     {
-        Argument<int> idArg = new("id", "Id of todo");
+        Argument<int> idArg = new("id", "Todo id");
         AddArgument(idArg);
 
         this.SetHandler(Handle, idArg);
